@@ -25,12 +25,13 @@ func DeleteListenHandler(store db.ListenStore) http.HandlerFunc {
 			return
 		}
 
-		trackID, err := strconv.Atoi(trackIDStr)
+		trackID64, err := strconv.ParseInt(trackIDStr, 10, 32)
 		if err != nil {
 			l.Debug().AnErr("error", err).Msg("DeleteListenHandler: Invalid track ID")
 			utils.WriteError(w, "invalid id", http.StatusBadRequest)
 			return
 		}
+		trackID := int32(trackID64)
 
 		unixStr := r.URL.Query().Get("unix")
 		if unixStr == "" {
@@ -55,7 +56,7 @@ func DeleteListenHandler(store db.ListenStore) http.HandlerFunc {
 			return
 		}
 
-		err = store.DeleteListen(ctx, int32(trackID), time.Unix(unix, 0), u.ID)
+		err = store.DeleteListen(ctx, trackID, time.Unix(unix, 0), u.ID)
 		if err != nil {
 			l.Err(err).Msg("DeleteListenHandler: Failed to delete listen record")
 			utils.WriteError(w, "failed to delete listen", http.StatusInternalServerError)

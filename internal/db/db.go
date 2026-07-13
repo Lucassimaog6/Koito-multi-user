@@ -72,7 +72,7 @@ type ListenStore interface {
 	GetListenActivity(ctx context.Context, opts ListenActivityOpts) ([]ListenActivityItem, error)
 	GetInterest(ctx context.Context, opts GetInterestOpts) ([]InterestBucket, error)
 	SaveListen(ctx context.Context, opts SaveListenOpts) error
-	DeleteListen(ctx context.Context, trackId int32, listenedAt time.Time) error
+	DeleteListen(ctx context.Context, trackId int32, listenedAt time.Time, userID int32) error
 	CountListens(ctx context.Context, timeframe Timeframe) (int64, error)
 	CountListensToItem(ctx context.Context, opts TimeListenedOpts) (int64, error)
 	CountTimeListened(ctx context.Context, timeframe Timeframe) (int64, error)

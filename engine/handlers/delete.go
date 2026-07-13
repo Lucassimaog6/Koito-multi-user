@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gabehf/koito/engine/middleware"
 	"github.com/gabehf/koito/internal/db"
 	"github.com/gabehf/koito/internal/logger"
 	"github.com/gabehf/koito/internal/utils"
@@ -47,7 +48,14 @@ func DeleteListenHandler(store db.ListenStore) http.HandlerFunc {
 
 		l.Debug().Msgf("DeleteListenHandler: Deleting listen record for track ID %d at timestamp %d", trackID, unix)
 
-		err = store.DeleteListen(ctx, int32(trackID), time.Unix(unix, 0))
+		u := middleware.GetUserFromContext(ctx)
+		if u == nil {
+			l.Debug().Msg("DeleteListenHandler: Unauthorized request (user context is nil)")
+			utils.WriteError(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		err = store.DeleteListen(ctx, int32(trackID), time.Unix(unix, 0), u.ID)
 		if err != nil {
 			l.Err(err).Msg("DeleteListenHandler: Failed to delete listen record")
 			utils.WriteError(w, "failed to delete listen", http.StatusInternalServerError)

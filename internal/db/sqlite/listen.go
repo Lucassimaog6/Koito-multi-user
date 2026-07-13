@@ -31,13 +31,16 @@ func (s *Sqlite) SaveListen(ctx context.Context, opts db.SaveListenOpts) error {
 	return err
 }
 
-func (s *Sqlite) DeleteListen(ctx context.Context, trackId int32, listenedAt time.Time) error {
+func (s *Sqlite) DeleteListen(ctx context.Context, trackId int32, listenedAt time.Time, userID int32) error {
 	if trackId == 0 {
 		return errors.New("DeleteListen: required parameter 'trackId' missing")
 	}
+	if userID == 0 {
+		return errors.New("DeleteListen: required parameter 'userID' missing")
+	}
 	_, err := s.db.ExecContext(ctx,
-		`DELETE FROM listens WHERE track_id = ? AND listened_at = ?`,
-		trackId, listenedAt.Unix(),
+		`DELETE FROM listens WHERE track_id = ? AND listened_at = ? AND user_id = ?`,
+		trackId, listenedAt.Unix(), userID,
 	)
 	return err
 }
